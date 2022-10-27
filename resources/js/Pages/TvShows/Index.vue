@@ -8,12 +8,55 @@
     <div>
       <section class="container mx-auto p-6 text-sm">
         <div class="w-full flex mb-4">
-          <Link
-            :href="route('admin.tv-shows.create')"
-            class="px-4 py-2 bg-green-600 hover:bg-green-800 text-white rounded"
-          >
-            Create TV Show
-          </Link>
+          <form class="flex space-x-4 shadow bg-white rounded-md p-2">
+            <div class="p-1 flex items-center">
+              <label
+                for="tmdb_id_g"
+                class="block text-sm font-medium text-gray-700 mr-4"
+                >TV Show TMDB ID</label
+              >
+              <div class="relative rounded-md shadow-sm">
+                <input
+                  v-model="tvShowTMDBId"
+                  id="tmdb_id_g"
+                  name="tmdb_id_g"
+                  class="px-3 py-2 border border-gray-300 rounded"
+                  placeholder="TV Show ID"
+                />
+              </div>
+            </div>
+            <div class="p-1">
+              <button
+                type="button"
+                @click="generateTvShow"
+                class="
+                  inline-flex
+                  items-center
+                  justify-center
+                  py-2
+                  px-4
+                  border border-transparent
+                  text-base
+                  leading-6
+                  font-medium
+                  rounded-md
+                  text-white
+                  bg-green-600
+                  hover:bg-green-500
+                  focus:outline-none
+                  focus:border-indigo-700
+                  focus:shadow-outline-indigo
+                  active:bg-green-700
+                  transition
+                  duration-150
+                  ease-in-out
+                  disabled:opacity-50
+                "
+              >
+                <span>Generate</span>
+              </button>
+            </div>
+          </form>
         </div>
 
         <div class="w-full mb-8 overflow-hidden bg-white rounded-lg shadow-lg">
@@ -85,6 +128,9 @@
               <TableRow v-for="tvShow in tvShows.data" :key="tvShow.id">
                 <TableData>{{ tvShow.name }}</TableData>
                 <TableData class="font-semibold">{{ tvShow.slug }}</TableData>
+                <TableData class="font-semibold">
+                  {{ tvShow.poster_path }}
+                </TableData>
                 <TableData>
                   <div class="flex justify-around">
                     <ButtonLink
@@ -135,6 +181,7 @@ const props = defineProps({
 
 const search = ref(props.filters.search);
 const perPage = ref(props.filters.perPage ?? 5);
+const tvShowTMDBId = ref("");
 
 watch(search, (value) => {
   Inertia.get(
@@ -154,6 +201,18 @@ function getTvShows() {
     {
       preserveState: true,
       replace: true,
+    }
+  );
+}
+
+function generateTvShow() {
+  Inertia.post(
+    route("admin.tv-shows.index"),
+    {
+      tvShowTMDBId: tvShowTMDBId.value,
+    },
+    {
+      onFinish: () => (tvShowTMDBId.value = ""),
     }
   );
 }
