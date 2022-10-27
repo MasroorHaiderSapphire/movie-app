@@ -58,4 +58,30 @@ class TvShowController extends Controller
                 ->with('flash.banner', 'Some error with endpoint')
                 ->with('flash.bannerStyle', 'danger');
     }
+
+    public function edit(TvShow $tvShow)
+    {
+        return Inertia::render('TvShows/Edit', [
+            'tvShow' => $tvShow,
+        ]);
+    }
+
+    public function update(TvShow $tvShow, Request $request)
+    {
+        $tvShow->update(
+            $request->validate(
+                ['name' => 'required']
+            )
+        );
+
+        return back()
+            ->with('flash.banner', 'TV Show updated successfully');
+    }
+
+    public function destroy(TvShow $tvShow)
+    {
+        $tvShow->delete();
+        return back()
+            ->with('flash.banner', 'TV Show deleted successfully');
+    }
 }
