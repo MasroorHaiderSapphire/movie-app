@@ -134,12 +134,6 @@
                 <TableData>
                   <div class="flex justify-around">
                     <ButtonLink
-                      class="bg-blue-500 hover:bg-blue-700"
-                      :link="route('admin.seasons.index', tvShow.id)"
-                    >
-                      Seasons
-                    </ButtonLink>
-                    <ButtonLink
                       class="bg-green-500 hover:bg-green-700"
                       :link="route('admin.tv-shows.edit', tvShow.id)"
                     >
