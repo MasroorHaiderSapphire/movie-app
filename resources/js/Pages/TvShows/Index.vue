@@ -132,7 +132,7 @@
                   {{ tvShow.poster_path }}
                 </TableData>
                 <TableData>
-                  <div class="flex justify-around">
+                  <div class="flex justify-around gap-x-1">
                     <ButtonLink
                       class="bg-blue-500 hover:bg-blue-700"
                       :link="route('admin.seasons.index', tvShow.id)"

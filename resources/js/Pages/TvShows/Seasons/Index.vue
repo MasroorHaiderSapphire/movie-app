@@ -2,7 +2,7 @@
   <AdminLayout title="Dashboard">
     <template #header>
       <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-        TV Shows
+        {{ tvShow.name }} | <span class="text-gray-500">Seasons</span>
       </h2>
     </template>
     <div>
@@ -13,11 +13,11 @@
               <label
                 for="tmdb_id_g"
                 class="block text-sm font-medium text-gray-700 mr-4"
-                >TV Show TMDB ID</label
+                >Season TMDB ID</label
               >
               <div class="relative rounded-md shadow-sm">
                 <input
-                  v-model="tvShowTMDBId"
+                  v-model="seasonTMDBId"
                   id="tmdb_id_g"
                   name="tmdb_id_g"
                   class="px-3 py-2 border border-gray-300 rounded"
@@ -28,7 +28,7 @@
             <div class="p-1">
               <button
                 type="button"
-                @click="generateTvShow"
+                @click="generateSeason"
                 class="
                   inline-flex
                   items-center
@@ -98,7 +98,7 @@
               <div class="flex">
                 <select
                   v-model="perPage"
-                  @change="getTvShows"
+                  @change="getSeasons"
                   class="
                     px-4
                     py-3
@@ -122,20 +122,34 @@
               <template #tableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Slug</TableHead>
+                <TableHead>Season No.</TableHead>
                 <TableHead>Poster</TableHead>
                 <TableHead>Manage</TableHead>
               </template>
-              <TableRow v-for="tvShow in tvShows.data" :key="tvShow.id">
-                <TableData>{{ tvShow.name }}</TableData>
-                <TableData class="font-semibold">{{ tvShow.slug }}</TableData>
+              <TableRow v-for="season in seasons.data" :key="season.id">
+                <TableData>{{ season.name }}</TableData>
+                <TableData class="font-semibold">{{ season.slug }}</TableData>
                 <TableData class="font-semibold">
-                  {{ tvShow.poster_path }}
+                  {{ season.season_number }}
+                </TableData>
+                <TableData class="font-semibold">
+                  {{ season.poster_path }}
                 </TableData>
                 <TableData>
-                  <div class="flex justify-around">
+                  <div class="flex justify-around gap-x-1">
+                    <ButtonLink
+                      class="bg-blue-500 hover:bg-blue-700"
+                      :link="
+                        route('admin.episodes.index', [tvShow.id, season.id])
+                      "
+                    >
+                      Episodes
+                    </ButtonLink>
                     <ButtonLink
                       class="bg-green-500 hover:bg-green-700"
-                      :link="route('admin.tv-shows.edit', tvShow.id)"
+                      :link="
+                        route('admin.seasons.edit', [tvShow.id, season.id])
+                      "
                     >
                       Edit
                     </ButtonLink>
@@ -143,7 +157,9 @@
                       class="bg-red-500 hover:bg-red-700"
                       method="DELETE"
                       as="button"
-                      :link="route('admin.tv-shows.destroy', tvShow.id)"
+                      :link="
+                        route('admin.seasons.destroy', [tvShow.id, season.id])
+                      "
                     >
                       Delete
                     </ButtonLink>
@@ -152,7 +168,7 @@
               </TableRow>
             </Table>
             <div class="m-2 p-2">
-              <Pagination :links="tvShows.links" />
+              <Pagination :links="seasons.links" />
             </div>
           </div>
         </div>
@@ -161,31 +177,32 @@
   </AdminLayout>
 </template>
 
-  <script setup>
-import AdminLayout from "../../Layouts/AdminLayout.vue";
+<script setup>
+import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { Link } from "@inertiajs/inertia-vue3";
-import Pagination from "../../Components/Pagination.vue";
+import Pagination from "@/Components/Pagination.vue";
 import { ref } from "@vue/reactivity";
 import { watch } from "@vue/runtime-core";
 import { Inertia } from "@inertiajs/inertia";
-import Table from "../../Components/Table.vue";
-import TableData from "../../Components/TableData.vue";
-import TableHead from "../../Components/TableHead.vue";
-import TableRow from "../../Components/TableRow.vue";
-import ButtonLink from "../../Components/ButtonLink.vue";
+import Table from "@/Components/Table.vue";
+import TableData from "@/Components/TableData.vue";
+import TableHead from "@/Components/TableHead.vue";
+import TableRow from "@/Components/TableRow.vue";
+import ButtonLink from "@/Components/ButtonLink.vue";
 
 const props = defineProps({
-  tvShows: Object,
+  tvShow: Object,
+  seasons: Object,
   filters: Object,
 });
 
 const search = ref(props.filters.search);
 const perPage = ref(props.filters.perPage ?? 5);
-const tvShowTMDBId = ref("");
+const seasonTMDBId = ref("");
 
 watch(search, (value) => {
   Inertia.get(
-    route("admin.tv-shows.index"),
+    route("admin.seasons.index", props.tvShow.id),
     { search: value, perPage: perPage.value },
     {
       preserveState: true,
@@ -194,7 +211,7 @@ watch(search, (value) => {
   );
 });
 
-function getTvShows() {
+function getSeasons() {
   Inertia.get(
     route("admin.tv-shows.index"),
     { perPage: perPage.value, search: search.value },
@@ -205,18 +222,15 @@ function getTvShows() {
   );
 }
 
-function generateTvShow() {
+function generateSeason() {
   Inertia.post(
     route("admin.tv-shows.index"),
     {
-      tvShowTMDBId: tvShowTMDBId.value,
+      seasonTMDBId: seasonTMDBId.value,
     },
     {
-      onFinish: () => (tvShowTMDBId.value = ""),
+      onFinish: () => (seasonTMDBId.value = ""),
     }
   );
 }
 </script>
-
-  <style>
-</style>
