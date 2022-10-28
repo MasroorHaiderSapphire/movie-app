@@ -17,11 +17,11 @@
               >
               <div class="relative rounded-md shadow-sm">
                 <input
-                  v-model="seasonTMDBId"
+                  v-model="seasonNumber"
                   id="tmdb_id_g"
                   name="tmdb_id_g"
                   class="px-3 py-2 border border-gray-300 rounded"
-                  placeholder="TV Show ID"
+                  placeholder="Season no."
                 />
               </div>
             </div>
@@ -140,7 +140,10 @@
                     <ButtonLink
                       class="bg-blue-500 hover:bg-blue-700"
                       :link="
-                        route('admin.episodes.index', [tvShow.id, season.id])
+                        route('admin.episodes.index', [
+                          tvShow.id,
+                          season.season_number,
+                        ])
                       "
                     >
                       Episodes
@@ -148,7 +151,10 @@
                     <ButtonLink
                       class="bg-green-500 hover:bg-green-700"
                       :link="
-                        route('admin.seasons.edit', [tvShow.id, season.id])
+                        route('admin.seasons.edit', [
+                          tvShow.id,
+                          season.season_number,
+                        ])
                       "
                     >
                       Edit
@@ -198,7 +204,7 @@ const props = defineProps({
 
 const search = ref(props.filters.search);
 const perPage = ref(props.filters.perPage ?? 5);
-const seasonTMDBId = ref("");
+const seasonNumber = ref("");
 
 watch(search, (value) => {
   Inertia.get(
@@ -213,7 +219,7 @@ watch(search, (value) => {
 
 function getSeasons() {
   Inertia.get(
-    route("admin.tv-shows.index"),
+    route("admin.seasons.index", props.tvShow.id),
     { perPage: perPage.value, search: search.value },
     {
       preserveState: true,
@@ -224,12 +230,12 @@ function getSeasons() {
 
 function generateSeason() {
   Inertia.post(
-    route("admin.tv-shows.index"),
+    route("admin.seasons.index", props.tvShow.id),
     {
-      seasonTMDBId: seasonTMDBId.value,
+      seasonNumber: seasonNumber.value,
     },
     {
-      onFinish: () => (seasonTMDBId.value = ""),
+      onFinish: () => (seasonNumber.value = ""),
     }
   );
 }
