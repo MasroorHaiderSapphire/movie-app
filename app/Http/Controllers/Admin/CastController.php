@@ -74,10 +74,7 @@ class CastController extends Controller
             'poster_path' => 'required'
         ]);
 
-        $cast->update([
-            'name' => $request->get('name'),
-            'poster_path' => $request->get('poster_path'),
-        ]);
+        $cast->update($validated);
 
         return back()
             ->with('flash.banner', 'Cast updated successfully');

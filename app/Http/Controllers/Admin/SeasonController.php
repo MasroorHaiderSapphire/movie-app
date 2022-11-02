@@ -14,7 +14,7 @@ class SeasonController extends Controller
     public function index(TvShow $tvShow, Request $request)
     {
         $searchTerm = $request->get('search');
-        $paginate = $request->get('perPage') ?? 5;
+        $paginate   = $request->get('perPage') ?? 5;
 
         return Inertia::render('TvShows/Seasons/Index', [
             'seasons' => Season::query()
@@ -25,16 +25,16 @@ class SeasonController extends Controller
                 ->paginate($paginate)
                 ->withQueryString(),
             'filters' => $request->only(['search', 'perPage']),
-            'tvShow' => $tvShow,
+            'tvShow'  => $tvShow,
         ]);
     }
 
     public function store(TvShow $tvShow, Request $request)
     {
         $seasonNumber = $request->get('seasonNumber');
-        $season = $tvShow->seasons()->where('season_number', $seasonNumber)->exists();
-        $endPoint = config('services.tmdb.endpoint');
-        $apiKey = config('services.tmdb.secret');
+        $season       = $tvShow->seasons()->where('season_number', $seasonNumber)->exists();
+        $endPoint     = config('services.tmdb.endpoint');
+        $apiKey       = config('services.tmdb.secret');
 
         if ($season)
             return back()
@@ -47,10 +47,10 @@ class SeasonController extends Controller
 
         if ($tmdbSeason->successful()) {
             Season::create([
-                'tv_show_id' => $tvShow->id,
-                'tmdb_id' => $tmdbSeason['id'],
-                'name' => $tmdbSeason['name'],
-                'poster_path' => $tmdbSeason['poster_path'],
+                'tv_show_id'    => $tvShow->id,
+                'tmdb_id'       => $tmdbSeason['id'],
+                'name'          => $tmdbSeason['name'],
+                'poster_path'   => $tmdbSeason['poster_path'],
                 'season_number' => $tmdbSeason['season_number'],
             ]);
 
@@ -62,9 +62,24 @@ class SeasonController extends Controller
                 ->with('flash.bannerStyle', 'danger');
     }
 
-    public function edit()
+    public function edit(TvShow $tvShow, Season $season)
     {
-        //
+        return Inertia::render('TvShows/Seasons/Edit', [
+            'tvShow' => $tvShow,
+            'season' => $season,
+        ]);
+    }
+
+    public function update(TvShow $tvShow, Season $season, Request $request)
+    {
+        $season->update(
+            $request->validate(
+                ['name' => 'required']
+            )
+        );
+
+        return back()
+            ->with('flash.banner', 'Season updated successfully');
     }
 
     public function destroy(TvShow $tvShow, Season $season)

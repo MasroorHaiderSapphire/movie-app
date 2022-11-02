@@ -1,5 +1,5 @@
 <template>
-  <AdminLayout title="Dashboard">
+  <AdminLayout title="Tags">
     <template #header>
       <h2 class="font-semibold text-xl text-gray-800 leading-tight">Tags</h2>
     </template>

@@ -69,6 +69,7 @@
 <script setup>
 import { Link, useForm } from "@inertiajs/inertia-vue3";
 import AdminLayout from "../../Layouts/AdminLayout.vue";
+import { Form, Field, ErrorMessage } from "vee-validate";
 
 const form = useForm({
   tagName: "",

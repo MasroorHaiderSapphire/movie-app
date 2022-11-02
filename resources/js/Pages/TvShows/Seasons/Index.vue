@@ -140,10 +140,7 @@
                     <ButtonLink
                       class="bg-blue-500 hover:bg-blue-700"
                       :link="
-                        route('admin.episodes.index', [
-                          tvShow.id,
-                          season.season_number,
-                        ])
+                        route('admin.episodes.index', [tvShow.id, season.id])
                       "
                     >
                       Episodes
@@ -151,10 +148,7 @@
                     <ButtonLink
                       class="bg-green-500 hover:bg-green-700"
                       :link="
-                        route('admin.seasons.edit', [
-                          tvShow.id,
-                          season.season_number,
-                        ])
+                        route('admin.seasons.edit', [tvShow.id, season.id])
                       "
                     >
                       Edit

@@ -18,10 +18,7 @@ class TagController extends Controller
         return Inertia::render(
             'Tags/Index',
             [
-                'tags' => Tag::query()
-                    ->when($searchTerm, function ($query, $search) {
-                        $query->where('tag_name', 'like', "%$search%");
-                    })
+                'tags' => Tag::where('tag_name', 'like', "%$searchTerm%")
                     ->paginate($paginate)
                     ->withQueryString(),
                 'filters' => $request->only(['search', 'perPage']),

@@ -1,7 +1,10 @@
 <template>
   <AdminLayout title="Dashboard">
     <template #header>
-      <h2 class="font-semibold text-xl text-gray-800 leading-tight">Movies</h2>
+      <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        {{ tvShow.name }} | Season {{ season.season_number }} |
+        <span class="text-gray-500">Episodes</span>
+      </h2>
     </template>
     <div>
       <section class="container mx-auto p-6 text-sm">
@@ -11,22 +14,22 @@
               <label
                 for="tmdb_id_g"
                 class="block text-sm font-medium text-gray-700 mr-4"
-                >Movie TMDB ID</label
+                >Episode no.</label
               >
               <div class="relative rounded-md shadow-sm">
                 <input
-                  v-model="movieTMDBId"
+                  v-model="episodeNumber"
                   id="tmdb_id_g"
                   name="tmdb_id_g"
                   class="px-3 py-2 border border-gray-300 rounded"
-                  placeholder="Movie ID"
+                  placeholder="Episode no."
                 />
               </div>
             </div>
             <div class="p-1">
               <button
                 type="button"
-                @click="generateMovie"
+                @click="generateEpisode"
                 class="
                   inline-flex
                   items-center
@@ -96,7 +99,7 @@
               <div class="flex">
                 <select
                   v-model="perPage"
-                  @change="getMovies"
+                  @change="getEpisodes"
                   class="
                     px-4
                     py-3
@@ -118,24 +121,21 @@
           <div class="w-full overflow-x-auto">
             <Table>
               <template #tableHead>
-                <TableHead>Poster</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Slug</TableHead>
+                <TableHead>Episode No.</TableHead>
                 <TableHead>Visibility</TableHead>
                 <TableHead>Manage</TableHead>
               </template>
-              <TableRow v-for="movie in movies.data" :key="movie.id">
+              <TableRow v-for="episode in episodes.data" :key="episode.id">
+                <TableData>{{ episode.name }}</TableData>
+                <TableData class="font-semibold">{{ episode.slug }}</TableData>
                 <TableData class="font-semibold">
-                  <img
-                    class="h-12 w-12 rounded object-cover"
-                    :src="`https://www.themoviedb.org/t/p/w220_and_h330_face/${movie.poster_path}`"
-                  />
+                  {{ episode.episode_number }}
                 </TableData>
-                <TableData>{{ movie.title }}</TableData>
-                <TableData class="font-semibold">{{ movie.slug }}</TableData>
                 <TableData class="font-semibold">
                   <span
-                    v-if="movie.is_public"
+                    v-if="episode.is_public"
                     class="
                       px-2
                       inline-flex
@@ -169,7 +169,13 @@
                   <div class="flex justify-around gap-x-1">
                     <ButtonLink
                       class="bg-green-500 hover:bg-green-700"
-                      :link="route('admin.movies.edit', movie.id)"
+                      :link="
+                        route('admin.episodes.edit', [
+                          tvShow.id,
+                          season.id,
+                          episode.id,
+                        ])
+                      "
                     >
                       Edit
                     </ButtonLink>
@@ -177,7 +183,13 @@
                       class="bg-red-500 hover:bg-red-700"
                       method="DELETE"
                       as="button"
-                      :link="route('admin.movies.destroy', movie.id)"
+                      :link="
+                        route('admin.episodes.destroy', [
+                          tvShow.id,
+                          season.id,
+                          episode.id,
+                        ])
+                      "
                     >
                       Delete
                     </ButtonLink>
@@ -186,7 +198,7 @@
               </TableRow>
             </Table>
             <div class="m-2 p-2">
-              <Pagination :links="movies.links" />
+              <Pagination :links="episodes.links" />
             </div>
           </div>
         </div>
@@ -195,42 +207,44 @@
   </AdminLayout>
 </template>
 
-  <script setup>
-import AdminLayout from "../../Layouts/AdminLayout.vue";
+<script setup>
+import AdminLayout from "@/Layouts/AdminLayout.vue";
 import { Link } from "@inertiajs/inertia-vue3";
-import Pagination from "../../Components/Pagination.vue";
+import Pagination from "@/Components/Pagination.vue";
 import { ref } from "@vue/reactivity";
 import { watch } from "@vue/runtime-core";
 import { Inertia } from "@inertiajs/inertia";
-import Table from "../../Components/Table.vue";
-import TableData from "../../Components/TableData.vue";
-import TableHead from "../../Components/TableHead.vue";
-import TableRow from "../../Components/TableRow.vue";
-import ButtonLink from "../../Components/ButtonLink.vue";
+import Table from "@/Components/Table.vue";
+import TableData from "@/Components/TableData.vue";
+import TableHead from "@/Components/TableHead.vue";
+import TableRow from "@/Components/TableRow.vue";
+import ButtonLink from "@/Components/ButtonLink.vue";
 
 const props = defineProps({
-  movies: Object,
+  tvShow: Object,
+  season: Object,
+  episodes: Object,
   filters: Object,
 });
 
 const search = ref(props.filters.search);
 const perPage = ref(props.filters.perPage ?? 5);
-const movieTMDBId = ref("");
+const episodeNumber = ref("");
 
 watch(search, (value) => {
   Inertia.get(
-    route("admin.movies.index"),
+    route("admin.episodes.index", [props.tvShow.id, props.season.id]),
     { search: value, perPage: perPage.value },
     {
       preserveState: true,
-      replace: "true",
+      replace: true,
     }
   );
 });
 
-function getMovies() {
+function getEpisodes() {
   Inertia.get(
-    route("admin.movies.index"),
+    route("admin.episodes.index", [props.tvShow.id, props.season.id]),
     { perPage: perPage.value, search: search.value },
     {
       preserveState: true,
@@ -239,18 +253,15 @@ function getMovies() {
   );
 }
 
-function generateMovie() {
+function generateEpisode() {
   Inertia.post(
-    route("admin.movies.index"),
+    route("admin.episodes.index", [props.tvShow.id, props.season.id]),
     {
-      movieTMDBId: movieTMDBId.value,
+      episodeNumber: episodeNumber.value,
     },
     {
-      onFinish: () => (movieTMDBId.value = ""),
+      onFinish: () => (episodeNumber.value = ""),
     }
   );
 }
 </script>
-
-  <style>
-</style>
