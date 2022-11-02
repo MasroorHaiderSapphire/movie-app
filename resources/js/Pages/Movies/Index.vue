@@ -93,12 +93,12 @@
                   />
                 </div>
               </div>
-              <div class="flex">
+              <div class="flex gap-2 px-2">
                 <select
                   v-model="perPage"
                   @change="getMovies"
                   class="
-                    px-4
+                    px-6
                     py-3
                     w-full
                     rounded-md
@@ -113,12 +113,12 @@
                   <option value="15">15 Per Page</option>
                 </select>
               </div>
-              <div class="ml-2 flex">
+              <div class="ml-2 flex gap-2">
                 <select
                   v-model="order"
                   @change="getMovies"
                   class="
-                    px-4
+                    px-6
                     py-3
                     w-full
                     rounded-md
