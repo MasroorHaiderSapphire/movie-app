@@ -113,6 +113,25 @@
                   <option value="15">15 Per Page</option>
                 </select>
               </div>
+              <div class="ml-2 flex">
+                <select
+                  v-model="order"
+                  @change="getMovies"
+                  class="
+                    px-4
+                    py-3
+                    w-full
+                    rounded-md
+                    bg-gray-100
+                    border-transparent
+                    focus:border-gray-500 focus:bg-white focus:ring-0
+                    text-sm
+                  "
+                >
+                  <option value="asc">Order asc</option>
+                  <option value="desc">Order desc</option>
+                </select>
+              </div>
             </div>
           </div>
           <div class="w-full overflow-x-auto">
@@ -120,7 +139,8 @@
               <template #tableHead>
                 <TableHead>Poster</TableHead>
                 <TableHead>Name</TableHead>
-                <TableHead>Slug</TableHead>
+                <TableHead>Rating</TableHead>
+                <TableHead>Visits</TableHead>
                 <TableHead>Visibility</TableHead>
                 <TableHead>Manage</TableHead>
               </template>
@@ -132,7 +152,8 @@
                   />
                 </TableData>
                 <TableData>{{ movie.title }}</TableData>
-                <TableData class="font-semibold">{{ movie.slug }}</TableData>
+                <TableData class="font-semibold">{{ movie.rating }}</TableData>
+                <TableData class="font-semibold">{{ movie.visits }}</TableData>
                 <TableData class="font-semibold">
                   <span
                     v-if="movie.is_public"
@@ -167,6 +188,12 @@
                 </TableData>
                 <TableData>
                   <div class="flex justify-around gap-x-1">
+                    <ButtonLink
+                      class="bg-blue-500 hover:bg-blue-700"
+                      :link="route('admin.movies.attach', movie.id)"
+                    >
+                      Attach
+                    </ButtonLink>
                     <ButtonLink
                       class="bg-green-500 hover:bg-green-700"
                       :link="route('admin.movies.edit', movie.id)"
@@ -215,12 +242,13 @@ const props = defineProps({
 
 const search = ref(props.filters.search);
 const perPage = ref(props.filters.perPage ?? 5);
+const order = ref(props.filters.order);
 const movieTMDBId = ref("");
 
 watch(search, (value) => {
   Inertia.get(
     route("admin.movies.index"),
-    { search: value, perPage: perPage.value },
+    { search: value, perPage: perPage.value, order: order.value },
     {
       preserveState: true,
       replace: "true",
@@ -231,7 +259,7 @@ watch(search, (value) => {
 function getMovies() {
   Inertia.get(
     route("admin.movies.index"),
-    { perPage: perPage.value, search: search.value },
+    { perPage: perPage.value, search: search.value, order: order.value },
     {
       preserveState: true,
       replace: true,

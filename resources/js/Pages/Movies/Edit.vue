@@ -42,6 +42,26 @@
               />
               <InputError class="mt-2" :message="form.errors.overview" />
             </div>
+            <div>
+              <InputLabel for="runtime" value="Runtime" />
+              <TextInput
+                id="runtime"
+                v-model="form.runtime"
+                type="number"
+                class="mt-1 block w-full"
+              />
+              <InputError class="mt-2" :message="form.errors.runtime" />
+            </div>
+            <div>
+              <InputLabel for="poster_path" value="Poster" />
+              <TextInput
+                id="poster_path"
+                v-model="form.poster_path"
+                type="text"
+                class="mt-1 block w-full"
+              />
+              <InputError class="mt-2" :message="form.errors.poster_path" />
+            </div>
             <div class="flex space-x-2 my-2 items-center">
               <Checkbox v-model:checked="form.is_public" name="is_public" />
               <InputLabel for="is_public" value="Publish" />
@@ -81,7 +101,9 @@ const form = useForm({
   title: props.movie.title,
   overview: props.movie.overview,
   poster_path: props.movie.poster_path,
-  is_public: props.movie.is_public,
+  is_public: Boolean(props.movie.is_public),
+  runtime: props.movie.runtime,
+  poster_path: props.movie.poster_path,
 });
 
 const props = defineProps({

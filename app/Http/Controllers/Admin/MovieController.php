@@ -15,15 +15,17 @@ class MovieController extends Controller
     public function index(Request $request)
     {
         $searchTerm = $request->get('search');
+        $order = $request->get('order') ?? 'desc';
         $paginate = $request->get('perPage') ?? 5;
 
         return Inertia::render(
             'Movies/Index',
             [
                 'movies' => Movie::where('title', 'like', "%$searchTerm%")
+                    ->orderBy('title', $order)
                     ->paginate($paginate)
                     ->withQueryString(),
-                'filters' => $request->only(['search', 'perPage']),
+                'filters' => $request->only(['search', 'perPage, order']),
             ]
         );
     }
@@ -83,12 +85,18 @@ class MovieController extends Controller
 
     public function update(Movie $movie, Request $request)
     {
-        $movie->update(
-            $request->validate([
-                'title' => 'required',
-                'overview' => 'required',
-                'poster_path' => 'required',
-            ])
-        );
+        $movie->update($request->all());
+
+        return back()
+            ->with('flash.banner', 'Movie updated successfully');
+    }
+
+    public function destroy(Movie $movie)
+    {
+        $movie->genres()->sync([]);
+        $movie->delete();
+
+        return back()
+            ->with('flash.banner', 'Movie deleted successfully');
     }
 }

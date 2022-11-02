@@ -1,15 +1,16 @@
 <?php
 
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\Application;
+use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Admin\CastController;
-use App\Http\Controllers\Admin\EpisodeController;
 use App\Http\Controllers\Admin\GenreController;
 use App\Http\Controllers\Admin\MovieController;
+use App\Http\Controllers\MovieAttachController;
 use App\Http\Controllers\Admin\SeasonController;
-use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Admin\TvShowController;
-use Illuminate\Foundation\Application;
-use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
+use App\Http\Controllers\Admin\EpisodeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,6 +41,17 @@ Route::middleware(['auth:sanctum', 'verified', 'role:admin'])
         })->name('index');
 
         Route::resource('/movies', MovieController::class);
+        Route::get('/movies/{movie}/attach', [MovieAttachController::class, 'index'])
+            ->name('movies.attach');
+        Route::post('/movies/{movie}/trailers', [MovieAttachController::class, 'addTrailer'])
+            ->name('movies.add.trailer');
+        Route::delete('/movies/{trailerUrl}/trailers', [MovieAttachController::class, 'deleteTrailer'])
+            ->name('trailers.destroy');
+        Route::post('/movies/{movie}/casts', [MovieAttachController::class, 'addCast'])
+            ->name('movies.add.casts');
+        Route::post('/movies/{movie}/tags', [MovieAttachController::class, 'addTags'])
+            ->name('movies.add.tags');
+
         Route::resource('/tv-shows', TvShowController::class);
         Route::resource('/tv-shows/{tv_show}/seasons', SeasonController::class);
         Route::resource('/tv-shows/{tv_show}/seasons/{season}/episodes', EpisodeController::class);
